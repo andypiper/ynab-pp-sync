@@ -433,8 +433,8 @@ def display_unmatched_table(unmatched):
         table.add_row(
             ynab["date"],
             f"£{abs(ynab['amount']):.2f}",
-            ynab["payee_name"],
-            ynab.get("memo", "")[:50],
+            ynab.get("payee_name") or "",
+            (ynab.get("memo") or "")[:50],
         )
 
     if len(unmatched) > 20:
