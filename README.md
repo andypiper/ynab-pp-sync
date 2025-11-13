@@ -146,7 +146,25 @@ PAYPAL_DATE_FORMAT=%Y-%m-%d
 PAYPAL_DATE_FORMAT=auto
 ```
 
-5. **Customize matching parameters** (optional)
+5. **Configure YNAB transaction filtering** (optional)
+
+By default, the tool only matches **uncleared** and **uncategorized** transactions. This focuses on new transactions that need attention:
+
+```bash
+# Only match uncleared transactions (default: true)
+YNAB_ONLY_UNCLEARED=true
+
+# Only match uncategorized transactions (default: true)
+YNAB_ONLY_UNCATEGORIZED=true
+```
+
+To include all transactions regardless of status:
+```bash
+YNAB_ONLY_UNCLEARED=false
+YNAB_ONLY_UNCATEGORIZED=false
+```
+
+6. **Customize matching parameters** (optional)
 
 ```bash
 DATE_TOLERANCE_DAYS=7
@@ -234,6 +252,14 @@ HIGH CONFIDENCE MATCHES (38)
 The tool searches YNAB for transactions containing PayPal keywords (configurable in `.env`):
 - Checks payee name and memo fields
 - Only considers outgoing transactions (negative amounts)
+- By default, filters to **uncleared** and **uncategorized** transactions only
+
+**Why filter by uncleared/uncategorized?**
+- **Uncleared transactions** are those that haven't cleared your bank yet - exactly the ones that need matching
+- **Uncategorized transactions** are those you haven't processed yet - the ones that need merchant details
+- This reduces noise from already-processed transactions
+- Improves match quality by focusing on transactions that need attention
+- Can be disabled via `.env` settings if you want to match all transactions
 
 ### 2. Matching Algorithm
 

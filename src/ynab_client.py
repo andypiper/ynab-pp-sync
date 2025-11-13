@@ -137,13 +137,17 @@ class YNABClient:
     def find_paypal_transactions(
         self,
         paypal_keywords: List[str],
-        since_date: Optional[datetime] = None
+        since_date: Optional[datetime] = None,
+        only_uncleared: bool = True,
+        only_uncategorized: bool = True
     ) -> List[Dict]:
         """Find transactions that appear to be PayPal payments.
 
         Args:
             paypal_keywords: List of keywords to identify PayPal transactions
             since_date: Optional date to search from
+            only_uncleared: Only include uncleared transactions (default: True)
+            only_uncategorized: Only include uncategorized transactions (default: True)
 
         Returns:
             List of parsed PayPal transactions from YNAB
@@ -162,8 +166,24 @@ class YNABClient:
             )
 
             # Only include outgoing transactions (negative amounts)
-            if is_paypal and txn.get("amount", 0) < 0:
-                paypal_transactions.append(self.parse_transaction(txn))
+            if not (is_paypal and txn.get("amount", 0) < 0):
+                continue
+
+            # Filter by cleared status if requested
+            if only_uncleared:
+                cleared = txn.get("cleared", "uncleared")
+                if cleared != "uncleared":
+                    continue
+
+            # Filter by category if requested
+            if only_uncategorized:
+                category_id = txn.get("category_id")
+                category_name = txn.get("category_name")
+                # Skip if transaction has a category assigned
+                if category_id is not None or category_name:
+                    continue
+
+            paypal_transactions.append(self.parse_transaction(txn))
 
         return paypal_transactions
 

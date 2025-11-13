@@ -197,12 +197,26 @@ def run_matcher(days, use_api, csv, output, update, confidence, env):
 
         try:
             ynab_paypal_transactions = ynab_client.find_paypal_transactions(
-                paypal_keywords=config.paypal_keywords, since_date=start_date
+                paypal_keywords=config.paypal_keywords,
+                since_date=start_date,
+                only_uncleared=config.only_uncleared,
+                only_uncategorized=config.only_uncategorized,
             )
             progress.stop()
-            console.print(
-                f"[green]✓ Found {len(ynab_paypal_transactions)} PayPal transactions in YNAB[/green]"
-            )
+
+            # Build status message
+            status_parts = []
+            if config.only_uncleared:
+                status_parts.append("uncleared")
+            if config.only_uncategorized:
+                status_parts.append("uncategorized")
+
+            status_msg = f"[green]✓ Found {len(ynab_paypal_transactions)} PayPal transactions in YNAB"
+            if status_parts:
+                status_msg += f" ({', '.join(status_parts)} only)"
+            status_msg += "[/green]"
+
+            console.print(status_msg)
         except Exception as e:
             progress.stop()
             console.print(f"[red]Error fetching YNAB transactions: {e}[/red]")

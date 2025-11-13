@@ -37,6 +37,10 @@ class Config:
         self.date_tolerance_days = int(os.getenv('DATE_TOLERANCE_DAYS', '7'))
         self.amount_tolerance_percent = float(os.getenv('AMOUNT_TOLERANCE_PERCENT', '3.0'))
 
+        # YNAB Filtering Configuration
+        self.only_uncleared = os.getenv('YNAB_ONLY_UNCLEARED', 'true').lower() == 'true'
+        self.only_uncategorized = os.getenv('YNAB_ONLY_UNCATEGORIZED', 'true').lower() == 'true'
+
         # Parse PayPal keywords
         keywords_str = os.getenv('PAYPAL_KEYWORDS', 'PayPal,PAYPAL,Pp *')
         self.paypal_keywords = [k.strip() for k in keywords_str.split(',')]
