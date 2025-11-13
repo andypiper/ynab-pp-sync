@@ -38,7 +38,7 @@ class Config:
         self.amount_tolerance_percent = float(os.getenv('AMOUNT_TOLERANCE_PERCENT', '3.0'))
 
         # YNAB Filtering Configuration
-        self.only_uncleared = os.getenv('YNAB_ONLY_UNCLEARED', 'true').lower() == 'true'
+        self.only_uncleared = os.getenv('YNAB_ONLY_UNCLEARED', 'false').lower() == 'true'
         self.only_uncategorized = os.getenv('YNAB_ONLY_UNCATEGORIZED', 'true').lower() == 'true'
 
         # Parse PayPal keywords
