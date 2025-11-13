@@ -129,19 +129,33 @@ class PayPalCSVParser:
                     self._detect_columns(reader.fieldnames)
 
                 # Parse each row
+                total_rows = 0
+                skipped_rows = 0
                 for row in reader:
+                    total_rows += 1
                     try:
                         txn = self._parse_row(row)
                         if txn:
                             transactions.append(txn)
+                        else:
+                            skipped_rows += 1
                     except Exception as e:
                         print(f"Warning: Error parsing row: {e}")
+                        skipped_rows += 1
                         continue
+
+                if skipped_rows > 0:
+                    print(f"Skipped {skipped_rows} rows out of {total_rows} (likely incoming payments or currency conversions)")
 
         except Exception as e:
             raise ValueError(f"Error reading CSV file: {e}")
 
-        print(f"Parsed {len(transactions)} transactions from PayPal CSV")
+        if transactions:
+            earliest = min(t['date'] for t in transactions)
+            latest = max(t['date'] for t in transactions)
+            print(f"Parsed {len(transactions)} transactions from PayPal CSV (dates: {earliest} to {latest})")
+        else:
+            print(f"Parsed {len(transactions)} transactions from PayPal CSV")
         return transactions
 
     def _parse_row(self, row: Dict[str, str]) -> Optional[Dict]:
