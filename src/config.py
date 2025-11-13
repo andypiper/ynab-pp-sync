@@ -31,6 +31,7 @@ class Config:
 
         # PayPal CSV Configuration
         self.paypal_csv_path = os.getenv('PAYPAL_CSV_PATH', 'paypal_transactions.csv')
+        self.paypal_date_format = os.getenv('PAYPAL_DATE_FORMAT', 'auto')
 
         # Matching Configuration
         self.date_tolerance_days = int(os.getenv('DATE_TOLERANCE_DAYS', '7'))

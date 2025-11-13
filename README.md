@@ -128,7 +128,25 @@ PAYPAL_CLIENT_SECRET=your_client_secret_here
 PAYPAL_MODE=live
 ```
 
-4. **Customize matching parameters** (optional)
+4. **Customize PayPal CSV date format** (optional)
+
+Specify the date format used in your PayPal CSV export:
+
+```bash
+# For UK/Europe/Australia (DD/MM/YYYY)
+PAYPAL_DATE_FORMAT=%d/%m/%Y
+
+# For US (MM/DD/YYYY)
+PAYPAL_DATE_FORMAT=%m/%d/%Y
+
+# For ISO format (YYYY-MM-DD)
+PAYPAL_DATE_FORMAT=%Y-%m-%d
+
+# Or use auto-detection (default)
+PAYPAL_DATE_FORMAT=auto
+```
+
+5. **Customize matching parameters** (optional)
 
 ```bash
 DATE_TOLERANCE_DAYS=7
@@ -289,8 +307,12 @@ Adjust parameters in `.env`:
 ### CSV Parsing Errors
 
 - PayPal CSV formats vary by region
-- Tool auto-detects column names
-- Ensure "Comma Delimited" format was selected
+- Tool auto-detects column names and date formats
+- Ensure "Comma Delimited" format was selected when exporting
+- If dates aren't parsing correctly, set `PAYPAL_DATE_FORMAT` in `.env` to match your CSV format:
+  - `%d/%m/%Y` for DD/MM/YYYY (UK, Europe, Australia)
+  - `%m/%d/%Y` for MM/DD/YYYY (US)
+  - `%Y-%m-%d` for YYYY-MM-DD (ISO)
 
 ## Maintainers
 

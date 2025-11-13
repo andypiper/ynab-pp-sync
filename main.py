@@ -269,7 +269,7 @@ def run_matcher(days, use_api, csv, output, update, confidence, env):
             task = progress.add_task(f"Parsing PayPal CSV: {csv_path}...", total=None)
 
             try:
-                parser = PayPalCSVParser(csv_path)
+                parser = PayPalCSVParser(csv_path, config.paypal_date_format)
                 all_paypal = parser.parse_transactions()
 
                 # Filter by date range

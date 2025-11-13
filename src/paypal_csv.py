@@ -26,13 +26,15 @@ class PayPalCSVParser:
         'item_title': ['Item Title', 'item_title', 'Subject', 'Note'],
     }
 
-    def __init__(self, csv_path: str):
+    def __init__(self, csv_path: str, date_format: str = "auto"):
         """Initialize PayPal CSV parser.
 
         Args:
             csv_path: Path to PayPal CSV file
+            date_format: Date format string (e.g., '%d/%m/%Y') or 'auto' for auto-detection
         """
         self.csv_path = Path(csv_path)
+        self.date_format = date_format
         self.column_map = {}
 
     def _detect_columns(self, header_row: List[str]) -> None:
@@ -60,7 +62,18 @@ class PayPalCSVParser:
         if not date_str:
             return None
 
-        # Try various date formats PayPal might use
+        # If a specific format is configured, try it first
+        if self.date_format and self.date_format.lower() != "auto":
+            try:
+                dt = datetime.strptime(date_str, self.date_format)
+                return dt.strftime("%Y-%m-%d")
+            except ValueError:
+                print(
+                    f"Warning: Could not parse date '{date_str}' with format '{self.date_format}', "
+                    f"falling back to auto-detection"
+                )
+
+        # Fall back to trying various date formats PayPal might use
         date_formats = [
             "%d/%m/%Y",  # DD/MM/YYYY (UK format)
             "%m/%d/%Y",  # MM/DD/YYYY (US format)
