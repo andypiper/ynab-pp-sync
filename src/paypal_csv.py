@@ -116,7 +116,7 @@ class PayPalCSVParser:
         transactions = []
 
         try:
-            with open(self.csv_path, 'r', encoding='utf-8') as csvfile:
+            with open(self.csv_path, 'r', encoding='utf-8-sig') as csvfile:
                 # Try to detect if it's using comma or tab delimiter
                 sample = csvfile.read(1024)
                 csvfile.seek(0)
@@ -124,9 +124,17 @@ class PayPalCSVParser:
 
                 reader = csv.DictReader(csvfile, delimiter=delimiter)
 
-                # Detect column names from header
+                # Clean column names (remove BOM, quotes, extra whitespace)
                 if reader.fieldnames:
+                    cleaned_fieldnames = [
+                        name.strip().strip('"').strip("'") for name in reader.fieldnames
+                    ]
+                    # Manually set the fieldnames to cleaned versions
+                    reader.fieldnames = cleaned_fieldnames
+
                     self._detect_columns(reader.fieldnames)
+                    print(f"DEBUG: CSV columns: {reader.fieldnames}")
+                    print(f"DEBUG: Detected mappings: {self.column_map}")
 
                 # Parse each row
                 total_rows = 0
@@ -190,6 +198,15 @@ class PayPalCSVParser:
         # Parse amounts
         gross = self._parse_amount(row.get(gross_col, '0'))
         net = self._parse_amount(row.get(net_col, '0'))
+
+        # DEBUG: Print first few rows
+        if len([1 for _ in row.keys()]) and not hasattr(self, '_debug_count'):
+            self._debug_count = 0
+        if hasattr(self, '_debug_count') and self._debug_count < 3:
+            print(f"DEBUG Row {self._debug_count}: gross_col={gross_col}, net_col={net_col}, gross={gross}, net={net}")
+            print(f"  Amount value: '{row.get(gross_col, '0')}'")
+            print(f"  Total value: '{row.get(net_col, '0')}'")
+            self._debug_count += 1
 
         # Only include outgoing payments (negative amounts)
         # PayPal CSV typically has negative values for payments out
