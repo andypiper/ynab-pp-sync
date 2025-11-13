@@ -152,8 +152,8 @@ class YNABClient:
         paypal_transactions = []
 
         for txn in transactions:
-            payee_name = txn.get("payee_name", "").lower()
-            memo = txn.get("memo", "").lower()
+            payee_name = (txn.get("payee_name") or "").lower()
+            memo = (txn.get("memo") or "").lower()
 
             # Check if any PayPal keyword appears in payee name or memo
             is_paypal = any(
