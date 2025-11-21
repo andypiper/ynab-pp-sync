@@ -61,26 +61,6 @@ class YNABClient:
             print(f"Error fetching YNAB transactions: {e}")
             raise
 
-    def get_accounts(self) -> List[Dict]:
-        """Fetch all accounts from YNAB budget.
-
-        Returns:
-            List of account dictionaries
-
-        Raises:
-            requests.HTTPError: If API request fails
-        """
-        url = f"{self.BASE_URL}/budgets/{self.budget_id}/accounts"
-
-        try:
-            response = requests.get(url, headers=self.headers)
-            response.raise_for_status()
-            data = response.json()
-            return data.get("data", {}).get("accounts", [])
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching YNAB accounts: {e}")
-            raise
-
     def update_transaction_memo(self, transaction_id: str, memo: str) -> bool:
         """Update a transaction's memo field.
 
@@ -139,7 +119,7 @@ class YNABClient:
         paypal_keywords: List[str],
         since_date: Optional[datetime] = None,
         only_uncleared: bool = True,
-        only_uncategorized: bool = True
+        only_unapproved: bool = True
     ) -> List[Dict]:
         """Find transactions that appear to be PayPal payments.
 
@@ -147,7 +127,7 @@ class YNABClient:
             paypal_keywords: List of keywords to identify PayPal transactions
             since_date: Optional date to search from
             only_uncleared: Only include uncleared transactions (default: True)
-            only_uncategorized: Only include uncategorized transactions (default: True)
+            only_unapproved: Only include unapproved transactions (default: True)
 
         Returns:
             List of parsed PayPal transactions from YNAB
@@ -175,12 +155,11 @@ class YNABClient:
                 if cleared != "uncleared":
                     continue
 
-            # Filter by category if requested
-            if only_uncategorized:
-                category_id = txn.get("category_id")
-                category_name = txn.get("category_name")
-                # Skip if transaction has a category assigned
-                if category_id is not None or category_name:
+            # Filter by approval status if requested
+            if only_unapproved:
+                approved = txn.get("approved", False)
+                # Skip if transaction is already approved
+                if approved:
                     continue
 
             paypal_transactions.append(self.parse_transaction(txn))

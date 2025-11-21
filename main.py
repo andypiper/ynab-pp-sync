@@ -23,7 +23,6 @@ from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
-from rich import print as rprint
 
 from src.config import Config
 from src.ynab_client import YNABClient
@@ -200,7 +199,7 @@ def run_matcher(days, use_api, csv, output, update, confidence, env):
                 paypal_keywords=config.paypal_keywords,
                 since_date=start_date,
                 only_uncleared=config.only_uncleared,
-                only_uncategorized=config.only_uncategorized,
+                only_unapproved=config.only_unapproved,
             )
             progress.stop()
 
@@ -208,8 +207,8 @@ def run_matcher(days, use_api, csv, output, update, confidence, env):
             status_parts = []
             if config.only_uncleared:
                 status_parts.append("uncleared")
-            if config.only_uncategorized:
-                status_parts.append("uncategorized")
+            if config.only_unapproved:
+                status_parts.append("unapproved")
 
             status_msg = f"[green]✓ Found {len(ynab_paypal_transactions)} PayPal transactions in YNAB"
             if status_parts:

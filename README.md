@@ -148,19 +148,19 @@ PAYPAL_DATE_FORMAT=auto
 
 5. **Configure YNAB transaction filtering** (optional)
 
-By default, the tool only matches **uncategorized** transactions. This focuses on transactions that need merchant identification for proper categorization:
+By default, the tool only matches **unapproved** transactions. This focuses on transactions that you haven't confirmed yet:
 
 ```bash
-# Only match uncategorized transactions (default: true)
-YNAB_ONLY_UNCATEGORIZED=true
+# Only match unapproved transactions (default: true)
+YNAB_ONLY_UNAPPROVED=true
 
 # Optionally filter by cleared status (default: false)
 YNAB_ONLY_UNCLEARED=false
 ```
 
-To include all transactions regardless of category:
+To include all transactions regardless of approval status:
 ```bash
-YNAB_ONLY_UNCATEGORIZED=false
+YNAB_ONLY_UNAPPROVED=false
 ```
 
 6. **Customize matching parameters** (optional)
@@ -251,12 +251,12 @@ HIGH CONFIDENCE MATCHES (38)
 The tool searches YNAB for transactions containing PayPal keywords (configurable in `.env`):
 - Checks payee name and memo fields
 - Only considers outgoing transactions (negative amounts)
-- By default, filters to **uncategorized** transactions only
+- By default, filters to **unapproved** transactions only
 
-**Why filter by uncategorized?**
-- **Uncategorized transactions** are those you haven't categorized yet - exactly the ones that need merchant identification
-- Once you have the actual merchant name (e.g., "Amazon UK" instead of just "PayPal"), you can properly categorize the transaction
-- This reduces noise from already-categorized transactions
+**Why filter by unapproved?**
+- **Unapproved transactions** are those you haven't confirmed yet - exactly the ones that need review
+- Once you have the actual merchant name (e.g., "Amazon UK" instead of just "PayPal"), you can approve the transaction
+- This reduces noise from already-approved transactions
 - Improves match quality by focusing on transactions that need attention
 - Can be disabled via `.env` settings if you want to match all transactions
 

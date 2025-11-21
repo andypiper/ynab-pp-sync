@@ -39,7 +39,7 @@ class Config:
 
         # YNAB Filtering Configuration
         self.only_uncleared = os.getenv('YNAB_ONLY_UNCLEARED', 'false').lower() == 'true'
-        self.only_uncategorized = os.getenv('YNAB_ONLY_UNCATEGORIZED', 'true').lower() == 'true'
+        self.only_unapproved = os.getenv('YNAB_ONLY_UNAPPROVED', 'true').lower() == 'true'
 
         # Parse PayPal keywords
         keywords_str = os.getenv('PAYPAL_KEYWORDS', 'PayPal,PAYPAL,Pp *')
@@ -65,33 +65,4 @@ class Config:
         Returns:
             True if valid, False otherwise
         """
-        if not self.paypal_client_id:
-            return False
-        if not self.paypal_client_secret:
-            return False
-        return True
-
-    def validate_paypal_csv(self) -> bool:
-        """Validate PayPal CSV configuration.
-
-        Returns:
-            True if CSV file exists, False otherwise
-        """
-        csv_path = Path(self.paypal_csv_path)
-        if not csv_path.exists():
-            print(f"Warning: PayPal CSV file not found: {self.paypal_csv_path}")
-            return False
-        return True
-
-    def get_paypal_source(self) -> str:
-        """Determine which PayPal source to use.
-
-        Returns:
-            'api', 'csv', or 'none'
-        """
-        if self.validate_paypal_csv():
-            return 'csv'
-        elif self.validate_paypal_api():
-            return 'api'
-        else:
-            return 'none'
+        return bool(self.paypal_client_id and self.paypal_client_secret)
